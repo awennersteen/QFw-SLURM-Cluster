@@ -14,6 +14,7 @@ QFW_SHIM_NODE="${QFW_SHIM_NODE:-shim-head}"
 QFW_IBM_NODE="${QFW_IBM_NODE:-ibm-156-nh}"
 QFW_AWS_NODE="${QFW_AWS_NODE:-aws}"
 QFW_FAKE_IQM_NODE="${QFW_FAKE_IQM_NODE:-fake-iqm-head}"
+QFW_BACKLINE_NODE="${QFW_BACKLINE_NODE:-backline-head}"
 QFW_SIMULATOR_NODES="${QFW_SIMULATOR_NODES:-nwqsim-head,nwqsim-worker-1,nwqsim-worker-2}"
 QFW_GATEWAY_HOST="${QFW_GATEWAY_HOST:-slurmctld}"
 QFW_GATEWAY_PORT="${QFW_GATEWAY_PORT:-18095}"
@@ -29,6 +30,7 @@ shim_run_dir="${QFW_SITE_RUN_ROOT}/qpm/shim-ornl-20q"
 ibm_run_dir="${QFW_SITE_RUN_ROOT}/qpm/shim-ibm-156-nh"
 aws_run_dir="${QFW_SITE_RUN_ROOT}/qpm/shim-aws-qpm"
 fake_iqm_run_dir="${QFW_SITE_RUN_ROOT}/qpm/fake-iqm"
+backline_run_dir="${QFW_SITE_RUN_ROOT}/qpm/backline-local"
 gateway_run_dir="${QFW_SITE_RUN_ROOT}/gateway"
 gateway_pid_file="${gateway_run_dir}/supervisor.pid"
 gateway_log_file="${QFW_GATEWAY_LOG_DIR}/gateway.log"
@@ -52,8 +54,10 @@ Actions:
 Options:
   --target TARGET
              Select all, directory, nwqsim, iqm, shim, ibm, aws, fake-iqm,
-             or gateway
-             (default: all)
+             backline, or gateway
+             (default: all). backline is opt-in: "all" starts and reports
+             without it, and stops it only when it is running
+             (needs tools/install-backline-venv.sh first)
   --json     Emit one machine-readable status document
   --dry-run  Print the commands without executing them
 EOF
@@ -371,6 +375,11 @@ stop_fake_iqm() {
 		--run-dir "${fake_iqm_run_dir}"
 }
 
+stop_backline() {
+	run_qfw "${QFW_BACKLINE_NODE}" qfw-qpm-svc stop \
+		--run-dir "${backline_run_dir}"
+}
+
 start_gateway() {
 	require_directory || return 1
 	if prepare_component_start \
@@ -427,6 +436,11 @@ fake_iqm_ready() {
 		--run-dir "${fake_iqm_run_dir}"
 }
 
+backline_ready() {
+	run_qfw "${QFW_BACKLINE_NODE}" qfw-qpm-svc status \
+		--run-dir "${backline_run_dir}"
+}
+
 require_directory() {
 	if directory_ready >/dev/null 2>&1; then
 		return 0
@@ -458,6 +472,9 @@ require_directory_dependents_stopped() {
 	fi
 	if fake_iqm_ready >/dev/null 2>&1; then
 		active+=(fake-iqm)
+	fi
+	if backline_ready >/dev/null 2>&1; then
+		active+=(backline)
 	fi
 	if gateway_managed_ready >/dev/null 2>&1; then
 		active+=(gateway)
@@ -576,6 +593,20 @@ start_fake_iqm() {
 		--run-dir "${fake_iqm_run_dir}" \
 		--site-config "${QFW_SITE_CONFIG}" \
 		--service-id fake-iqm \
+		--timeout "${QFW_SITE_START_TIMEOUT}"
+}
+
+start_backline() {
+	require_directory || return 1
+	if prepare_component_start \
+			"Backline QPM" backline_ready stop_backline; then
+		return 0
+	fi
+	run_qfw "${QFW_BACKLINE_NODE}" qfw-qpm-svc start \
+		--scope site \
+		--run-dir "${backline_run_dir}" \
+		--site-config "${QFW_SITE_CONFIG}" \
+		--service-id backline-local \
 		--timeout "${QFW_SITE_START_TIMEOUT}"
 }
 
@@ -964,6 +995,9 @@ stop_services() {
 
 	stop_gateway || status=1
 	stop_fake_iqm || status=1
+	if ${dry_run} || backline_ready >/dev/null 2>&1; then
+		stop_backline || status=1
+	fi
 	stop_aws || status=1
 	stop_ibm || status=1
 	stop_shim || status=1
@@ -974,6 +1008,11 @@ stop_services() {
 }
 
 target_status() {
+	if [[ "${target}" == backline ]]; then
+		# Opt-in, so not part of the "all" status table.
+		backline_ready
+		return
+	fi
 	service_status
 }
 
@@ -987,6 +1026,7 @@ start_target() {
 	ibm) start_ibm ;;
 	aws) start_aws ;;
 	fake-iqm) start_fake_iqm ;;
+	backline) start_backline ;;
 	gateway) start_gateway ;;
 	esac
 }
@@ -1004,6 +1044,7 @@ stop_target() {
 	ibm) stop_ibm ;;
 	aws) stop_aws ;;
 	fake-iqm) stop_fake_iqm ;;
+	backline) stop_backline ;;
 	gateway) stop_gateway ;;
 	esac
 }
@@ -1065,7 +1106,7 @@ main() {
 		return 2
 	}
 	case "${target}" in
-	all|directory|nwqsim|iqm|shim|ibm|aws|fake-iqm|gateway) ;;
+	all|directory|nwqsim|iqm|shim|ibm|aws|fake-iqm|backline|gateway) ;;
 	*) die "unknown target: ${target}" ;;
 	esac
 	if ! ${dry_run} && [[ ${EUID} -ne 0 ]]; then
