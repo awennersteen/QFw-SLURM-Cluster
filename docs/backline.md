@@ -27,8 +27,10 @@ The job script is `qri-backline/examples/job.sh`, cloned to
 `/workspace/qfw-container-base/qri-backline` by `tools/install-backline-venv.sh`:
 
 ```bash
-sbatch /workspace/qfw-container-base/qri-backline/examples/job.sh
+sbatch -A <account> /workspace/qfw-container-base/qri-backline/examples/job.sh
 ```
+
+qfw-slurm requires a Slurm account (`-A`); the provisioned test users use `qfw-test`.
 
 The job makes two requests:
 
