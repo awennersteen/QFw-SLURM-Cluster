@@ -5,7 +5,7 @@
 transport from the site inventory; the application reads that placement and runs its
 PennyLane/Catalyst program on it. It never sends circuits through QRI.
 
-It runs on `backline-head` and is opt-in: `qfw-site-services start` (target `all`) does not
+It runs on `qec-backline-head` and is opt-in: `qfw-site-services start` (target `all`) does not
 start it.
 
 ## Set up once
@@ -23,21 +23,24 @@ shared venv, so the QPM's inventory finds the precompiled decoders.
 
 ## Run a Backline program
 
-```bash
-#!/bin/bash
-#SBATCH --qpu=backline-local --workload-kind=quantum
-#SBATCH --circ-count=1 --max-qubits=3 --max-depth=3 --max-shots=10
-#SBATCH -N 1
+The job script is `qri-backline/examples/job.sh`, cloned to
+`/workspace/qfw-container-base/qri-backline` by `tools/install-backline-venv.sh`:
 
-module load backline
-source "${QFW_PREFIX}/bin/qfw-activate" --venv "${BACKLINE_VENV}"
-qfw-srun demo_qri_1_local_memcpy.py --qfw
+```bash
+sbatch /workspace/qfw-container-base/qri-backline/examples/job.sh
 ```
 
-qfw-slurm reserves `backline-local` while the job is allocated; the QPM applies its default
-intent (Steane decoding, any matching controller and coprocessor). Each step gets
-`QFW_RESERVATIONS`; the program reads its placement with `get_reservation` and does not
-release it. The allocation's teardown does.
+The job makes two requests:
+
+1. **Quantum resources.** The `#SBATCH --qpu=backline-local ...` lines. qfw-slurm reserves
+   `backline-local`'s quantum budget while the job is allocated and passes the reservation to
+   each step in `QFW_RESERVATIONS`. The allocation's teardown releases it.
+2. **Classical QEC resources.** The program asks the QPM for them against that reservation
+   (`reserve` with `for_reservation` and the `resource_intent` in
+   `intents/cpu-steane-memcpy.yaml`: a CPU controller, a Steane decoder, memcpy). The QPM
+   starts a `catalyst-executor` on `qec-backline-head` for the reservation and returns its
+   address in the placement; the program compiles locally and runs controller and decoder
+   there. The executor stops when the reservation ends.
 
 `--max-qubits` counts logical qubits.
 
@@ -45,9 +48,9 @@ release it. The allocation's teardown does.
 
 | File | Role |
 | --- | --- |
-| `docker-compose.yml`, `slurm.conf`, `tools/provision-qfw-cluster.sh` | the `backline-head` node |
+| `docker-compose.yml`, `slurm.conf`, `tools/provision-qfw-cluster.sh` | the `qec-backline-head` node |
 | `config/site-services.yaml` | the `backline-local` service, loading the `backline` module |
 | `config/device-access.yaml`, `config/qpu-users.json` | device record and user entitlement |
-| `config/qfw-slurm/resources.lua` | `--qpu=backline-local` |
-| `modulefiles/backline`, `tools/install-backline-venv.sh` | the shared Backline venv |
+| `config/qfw-slurm/resources.lua`, `config/qfw-slurm/plugin.conf` | `--qpu=backline-local` |
+| `modulefiles/backline`, `tools/install-backline-venv.sh` | the shared Backline venv and the demo checkout |
 | `tools/qfw-site-services` | `--target backline` start, stop, status |

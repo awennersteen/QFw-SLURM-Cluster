@@ -24,4 +24,7 @@ release="https://github.com/PennyLaneAI"
 
 lib="$("${venv}/bin/python" -c 'import importlib.util, pathlib; print(pathlib.Path(list(importlib.util.find_spec("catalyst").submodule_search_locations)[0]) / "lib")')"
 test -f "${lib}/libsteane_coprocessor_cpu.so"
+# The demo program, on the shared volume so jobs on any compute node can run it.
+demo="${QRI_BACKLINE_DIR:-/workspace/qfw-container-base/qri-backline}"
+[ -d "${demo}/.git" ] || git clone -q https://github.com/josephleekl/qri-backline "${demo}"
 echo "backline venv ready: ${venv} (decoders in ${lib})"

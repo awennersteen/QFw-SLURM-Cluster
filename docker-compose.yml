@@ -489,13 +489,13 @@ services:
     networks:
       - slurm-network
 
-  backline-head:
+  qec-backline-head:
     <<: *slurmd-resources
     image: ${IMAGE_NAME}:${IMAGE_TAG}
     init: true
     command: ["slurmd"]
-    hostname: backline-head
-    container_name: backline-head
+    hostname: qec-backline-head
+    container_name: qec-backline-head
     volumes:
       - root_ssh:/root/.ssh
       - etc_munge:/etc/munge
