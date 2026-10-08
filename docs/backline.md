@@ -10,10 +10,31 @@ start it.
 
 ## Set up once
 
+The Backline QPM is on the `backline-qpm` branch of
+[josephleekl/QFw](https://github.com/josephleekl/QFw/tree/backline-qpm). The image keeps its
+stock QFw; the Backline QPM runs from a development override built from that branch (see
+"Build and use a development QFw override" in the README).
+
+On the host:
+
+```bash
+git clone -b backline-qpm https://github.com/josephleekl/QFw-SLURM-Cluster
+cd QFw-SLURM-Cluster
+SHARED=/path/to/shared-dir
+./do_configure.sh --prefix "$SHARED"
+git clone --recursive -b backline-qpm https://github.com/josephleekl/QFw "$SHARED/QFw"
+./do_build.sh
+./do_startup.sh
+./do_qfw_build.sh --clean                     # the override, in $SHARED/qfw-install
+```
+
+In the cluster:
+
 ```bash
 ./do_ssh.sh                                   # into the cluster, as root
 /path/to/QFw-SLURM-Cluster/tools/install-backline-venv.sh   # shared venv: Catalyst 0.16.0b1 wheels
 qfw-site-services start                       # directory, gateway and the default QPMs
+export QFW_INSTALL_PREFIX=/workspace/qfw-container-base/qfw-install   # the override
 qfw-site-services --target backline start
 qfw-site-services --target backline status
 ```
