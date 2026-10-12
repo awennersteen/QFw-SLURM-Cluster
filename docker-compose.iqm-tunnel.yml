@@ -20,8 +20,14 @@
 # The URL in shared-dir/iqm-device-access.yaml must carry the tunnel port
 # (8443), since binding 443 on the host needs root. See IQM-ACCESS.md.
 #
-# If your endpoint is not the ORNL q20, change the hostname in all five entries
+# If your endpoint is not the ORNL q20, change the hostname in every entry below
 # to match IQM_HOST in iqm-tunnel.env.
+#
+# Who needs an entry: slurmctld (the gateway, and where the examples launch
+# services from), iqm-head (the site IQM QPM), shim-head (the site QRMI/QDMI
+# shim QPM) and the compute nodes, where allocations run local-mode services
+# and the shim smoke job. A container without one cannot resolve the host at
+# all, so a path that works on-site fails silently here.
 
 services:
   slurmctld:
@@ -29,5 +35,41 @@ services:
       - "qccsw.ccs.ornl.gov:host-gateway"
 
   iqm-head:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  shim-head:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c1:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c2:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c3:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c4:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c5:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c6:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c7:
+    extra_hosts:
+      - "qccsw.ccs.ornl.gov:host-gateway"
+
+  c8:
     extra_hosts:
       - "qccsw.ccs.ornl.gov:host-gateway"
