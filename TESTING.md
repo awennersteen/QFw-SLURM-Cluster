@@ -31,7 +31,6 @@ Select a QFw ref containing `setup/qdmi-requirements.txt` as described in
 ./do_startup.sh
 ```
 
-After the matching QFw change merges, omit these options to build from `main`.
 Along with Slurm and the simulators, the image installs QFw at
 `/opt/openqse/qfw`, and its Python
 environment at `/opt/openqse/qfw-venv`, including the shim's QRMI and QDMI

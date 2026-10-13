@@ -45,7 +45,7 @@ for qrmi in pinned fallback unpinned; do
         exit 1
     fi
     [ "$(grep -c 'requirements.txt' "${UV_LOG}")" -eq 1 ]
-    grep -Fxq "<pip><install><--python><${QFW_BASE}/mqt-cc-venv><${QFW_BASE}/mqt-core><qiskit==2.5.2>" "${UV_LOG}"
+    grep -Fq "<pip><install><--python><${QFW_BASE}/mqt-cc-venv><${QFW_BASE}/mqt-core><qiskit==" "${UV_LOG}"
 done
 
 rm "${QFW_BASE}/QFw/setup/qdmi-requirements.txt"

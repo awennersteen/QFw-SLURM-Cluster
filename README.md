@@ -35,7 +35,7 @@ The QFw checkout owns the QDMI dependency set in
 `setup/qdmi-requirements.txt`. Both image and developer installs consume it.
 Use a QFw ref containing this file, and use the matching shared-mount checkout
 for developer builds. The current set uses MQT Core 4.0 and QDMI 1.3.
-Move to QDMI 1.4 after Core 4.1 releases. Merge the paired QFw update first.
+QDMI 1.4 requires Core 4.1.
 
 <details open>
 <summary>Build a local image or configure a pulled image</summary>
@@ -432,8 +432,8 @@ The image builds and installs:
 - [QRMI] runtime: `libqrmi.so` and `qrmi.h` under `/opt/qfw/qrmi/`, the `qrmi`
   Python wheel installed into the [QFw] venv, and the SLURM SPANK plugin
   installed into `/usr/lib64/slurm/`
-- [QDMI] runtime: IQM's `iqm-qdmi` wheel installed into the [QFw]
-  venv
+- [QDMI] runtime: MQT Core and the IQM/Braket provider wheels installed into
+  the [QFw] venv from its shared QDMI requirements
 
 The image-level runtime environment includes:
 
