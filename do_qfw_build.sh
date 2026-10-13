@@ -186,9 +186,7 @@ if [ "${QFW_SKIP_VENV}" != "true" ]; then
         echo "No QRMI version pin available; installing unpinned qrmi" >&2
         uv pip install qrmi
     fi
-    # Resolve the matched Core/provider set owned by this QFw checkout.
-    # Keep the image install on the same file; its comments name the temporary
-    # compatibility constraints to remove with the coordinated releases.
+    # Use the same Core/provider versions as the image install.
     uv pip install -r "${QFW_SRC}/setup/qdmi-requirements.txt"
 
     # The bundled QHW packages (qhw-data, qhw-iqm, qhw-admission, qhw-scheduler)

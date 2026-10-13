@@ -29,12 +29,19 @@ SLURM SPANK plugin) and [QDMI] (via IQM's `iqm-qdmi` reference implementation).
 - [Detailed Reference](#detailed-reference)
 - [Troubleshooting](#troubleshooting)
 
-The QDMI dependency set is owned by the QFw checkout's
+The QFw checkout owns the QDMI dependency set in
 `setup/qdmi-requirements.txt`. The image and `do_qfw_build.sh` install that same
 file. Select a QFw checkout containing that file with `do_configure.sh`'s
 `--qfw-repository` and `--qfw-ref` options, and use the matching checkout on the
-shared mount for developer builds. Update that file together with QFw's legacy
-result handling when adopting the coordinated Core/IQM/Braket releases.
+shared mount for developer builds. The current set targets Core 4.0 and QDMI
+1.3; QDMI 1.4 support requires Core 4.1. Until the matching QFw change merges,
+select its branch instead of `main` or older release tags.
+
+```bash
+./do_configure.sh \
+  --qfw-repository https://github.com/marcelwa/QFw.git \
+  --qfw-ref codex/streamline-qdmi
+```
 
 ## Build The Environment
 
@@ -297,9 +304,12 @@ shared-dir/
 ```bash
 QFW_CONTAINER_BASE=/path/to/shared-dir
 
-./do_configure.sh --prefix "${QFW_CONTAINER_BASE}"
+./do_configure.sh --prefix "${QFW_CONTAINER_BASE}" \
+  --qfw-repository https://github.com/marcelwa/QFw.git \
+  --qfw-ref codex/streamline-qdmi
 
-git clone --recursive git@github.com:openQSE/QFw.git \
+git clone --recursive --branch codex/streamline-qdmi \
+  https://github.com/marcelwa/QFw.git \
   "${QFW_CONTAINER_BASE}/QFw"
 git clone https://github.com/munich-quantum-toolkit/core.git \
   "${QFW_CONTAINER_BASE}/mqt-core"

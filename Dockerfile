@@ -412,9 +412,7 @@ RUN set -ex \
     && test -x "${TNQVM_PREFIX}/bin/circuit_runner.tnqvm" \
     && test -f "${TNQVM_PREFIX}/xacc/plugins/libtnqvm.so"
 
-# QFw owns the matched Core/provider versions and temporary compatibility
-# comments in setup/qdmi-requirements.txt. Use the same file for image and
-# developer installs so a coordinated release update has one owner.
+# Use QFw's matched Core/provider versions for image and developer installs.
 # DEFw finds libfabric through pkg-config. Without libfabric's .pc file on the
 # search path it still builds, as a TCP-only transport, so the last check makes
 # sure the installed library links libfabric.

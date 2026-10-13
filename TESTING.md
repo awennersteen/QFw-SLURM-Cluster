@@ -21,14 +21,20 @@ separately below.
 
 ## Build the cluster
 
+Select a QFw ref containing `setup/qdmi-requirements.txt` as described in
+[README.md](README.md). Older release tags cannot supply these dependencies.
+
 ```bash
-./do_configure.sh --qfw-ref v0.1.0-rc.1 --qfw-slurm-ref v0.1.0-rc.1
+./do_configure.sh \
+  --qfw-repository https://github.com/marcelwa/QFw.git \
+  --qfw-ref codex/streamline-qdmi
 ./do_build.sh
 ./do_startup.sh
 ```
 
-Omit the two ref options to build from `main`. Along with Slurm and the
-simulators, the image installs QFw at `/opt/openqse/qfw`, and its Python
+After the matching QFw change merges, omit these options to build from `main`.
+Along with Slurm and the simulators, the image installs QFw at
+`/opt/openqse/qfw`, and its Python
 environment at `/opt/openqse/qfw-venv`, including the shim's QRMI and QDMI
 dependencies.
 
@@ -47,7 +53,8 @@ Clone QFw and MQT Core onto the shared mount and build them inside the running
 cluster:
 
 ```bash
-git clone --recursive https://github.com/openQSE/QFw.git shared-dir/QFw
+git clone --recursive --branch codex/streamline-qdmi \
+  https://github.com/marcelwa/QFw.git shared-dir/QFw
 git clone https://github.com/munich-quantum-toolkit/core.git shared-dir/mqt-core
 ./do_qfw_build.sh
 ```
