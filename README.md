@@ -29,21 +29,13 @@ SLURM SPANK plugin) and [QDMI] (via IQM's `iqm-qdmi` reference implementation).
 - [Detailed Reference](#detailed-reference)
 - [Troubleshooting](#troubleshooting)
 
-The QFw checkout owns the QDMI dependency set in
-`setup/qdmi-requirements.txt`. The image and `do_qfw_build.sh` install that same
-file. Select a QFw checkout containing that file with `do_configure.sh`'s
-`--qfw-repository` and `--qfw-ref` options, and use the matching checkout on the
-shared mount for developer builds. The current set targets Core 4.0 and QDMI
-1.3; QDMI 1.4 support requires Core 4.1. Until the matching QFw change merges,
-select its branch instead of `main` or older release tags.
-
-```bash
-./do_configure.sh \
-  --qfw-repository https://github.com/marcelwa/QFw.git \
-  --qfw-ref codex/streamline-qdmi
-```
-
 ## Build The Environment
+
+The QFw checkout owns the QDMI dependency set in
+`setup/qdmi-requirements.txt`. Both image and developer installs consume it.
+Use a QFw ref containing this file, and use the matching shared-mount checkout
+for developer builds. The current set uses MQT Core 4.0 and QDMI 1.3.
+Move to QDMI 1.4 after Core 4.1 releases. Merge the paired QFw update first.
 
 <details open>
 <summary>Build a local image or configure a pulled image</summary>
@@ -305,11 +297,9 @@ shared-dir/
 QFW_CONTAINER_BASE=/path/to/shared-dir
 
 ./do_configure.sh --prefix "${QFW_CONTAINER_BASE}" \
-  --qfw-repository https://github.com/marcelwa/QFw.git \
-  --qfw-ref codex/streamline-qdmi
+  --qfw-ref main
 
-git clone --recursive --branch codex/streamline-qdmi \
-  https://github.com/marcelwa/QFw.git \
+git clone --recursive git@github.com:openQSE/QFw.git \
   "${QFW_CONTAINER_BASE}/QFw"
 git clone https://github.com/munich-quantum-toolkit/core.git \
   "${QFW_CONTAINER_BASE}/mqt-core"
