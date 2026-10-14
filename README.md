@@ -34,8 +34,7 @@ SLURM SPANK plugin) and [QDMI] (via IQM's `iqm-qdmi` reference implementation).
 The QFw checkout owns the QDMI dependency set in
 `setup/qdmi-requirements.txt`. Both image and developer installs consume it.
 Use a QFw ref containing this file, and use the matching shared-mount checkout
-for developer builds. The current set uses MQT Core 4.0 and QDMI 1.3.
-QDMI 1.4 requires Core 4.1.
+for developer builds.
 
 <details open>
 <summary>Build a local image or configure a pulled image</summary>

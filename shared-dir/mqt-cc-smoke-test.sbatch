@@ -27,8 +27,7 @@ echo "[$(date)] mqt-cc-smoke-test on $(hostname)"
 from qiskit import QuantumCircuit
 
 from mqt.core.mlir import CompilerTarget, compile_program
-from mqt.core.qdmi import ProgramFormat
-from mqt.core.qdmi.driver import open_device
+from mqt.core.qdmi import ProgramFormat, open_device
 
 model = open_device("mqt.sc.iqm.garnet")
 target = CompilerTarget.from_device(model)

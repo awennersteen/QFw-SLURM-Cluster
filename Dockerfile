@@ -239,7 +239,7 @@ ARG NWQSIM_PREFIX=/opt/openqse/nwqsim
 ARG TNQVM_PREFIX=/opt/openqse/tnqvm
 ARG SIMULATOR_WORK_ROOT=/tmp/qfw-simulator-build
 ARG MQT_CORE_REPOSITORY=https://github.com/munich-quantum-toolkit/core.git
-ARG MQT_CORE_REF=151a69f9f99d0d1fb3bd735833d3f338ebb4d8a6
+ARG MQT_CORE_REF=v4.1.1
 ARG MQT_CC_VENV=/opt/openqse/mqt-cc-venv
 ARG MQT_CORE_SOURCE=/tmp/mqt-core-source
 
@@ -488,7 +488,8 @@ RUN set -ex \
     && test -x "${QFW_IMAGE_VENV}/bin/qfw-squeue" \
     && rm -rf "${QFW_SLURM_SOURCE}" "${QFW_SLURM_BUILD}"
 
-# The separate environment keeps Qiskit 2.5.x apart from QFw's SDK pins.
+# The compiler uses the same Core release as the QFw runtime, in a separate
+# environment because it needs Qiskit 2.5.x while QFw pins Qiskit 2.2.3.
 ARG SETUP_MLIR_VERSION=v1.4.2
 ARG MLIR_VERSION=23.1.1
 ARG MLIR_PREFIX=/opt/llvm-23.1.1
