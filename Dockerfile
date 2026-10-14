@@ -239,7 +239,8 @@ ARG NWQSIM_PREFIX=/opt/openqse/nwqsim
 ARG TNQVM_PREFIX=/opt/openqse/tnqvm
 ARG SIMULATOR_WORK_ROOT=/tmp/qfw-simulator-build
 ARG MQT_CORE_REPOSITORY=https://github.com/munich-quantum-toolkit/core.git
-ARG MQT_CORE_REF=v4.1.1
+# MQT Core v4.1.1, pinned to its immutable release commit.
+ARG MQT_CORE_REF=575acd1b9ca52e4608ccf4833e7d60640913cef4
 ARG MQT_CC_VENV=/opt/openqse/mqt-cc-venv
 ARG MQT_CORE_SOURCE=/tmp/mqt-core-source
 
@@ -425,7 +426,6 @@ RUN set -ex \
         -r "${QFW_IMAGE_SOURCE}/setup/requirements.txt" \
         "qrmi==${QRMI_VERSION}" \
         -r "${QFW_IMAGE_SOURCE}/setup/qdmi-requirements.txt" \
-        'jsonschema>=4' \
     && export PKG_CONFIG_PATH="${LIBFABRIC_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}" \
     && PATH="${QFW_IMAGE_VENV}/bin:${PATH}" cmake \
         -S "${QFW_IMAGE_SOURCE}" \

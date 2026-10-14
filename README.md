@@ -470,7 +470,6 @@ Useful options:
 ./do_configure.sh --image ghcr.io/openqse/qfw-slurm-cluster:20260503-v1.0
 ./do_configure.sh --qfw-build-jobs 4
 ./do_configure.sh --qfw-ref main
-./do_configure.sh --qfw-ref v0.1.0-rc.1 --qfw-slurm-ref v0.1.0-rc.1
 ```
 
 `./do_build.sh` builds the configured image:
