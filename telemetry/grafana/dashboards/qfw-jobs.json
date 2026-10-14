@@ -916,6 +916,46 @@
         "defaults": {},
         "overrides": []
       }
+    },
+    {
+      "type": "logs",
+      "title": "Service lines",
+      "datasource": {
+        "type": "loki",
+        "uid": "qfw-loki"
+      },
+      "description": "What the services logged outside any job: startup, directory registration, and anything else written with no trace to stitch it to, newest first. A job's own lines are on its trace page.",
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "qfw-loki"
+          },
+          "refId": "A",
+          "expr": "{service_name=~\"qfw-.+\"} | trace_id=\"\" | line_format \"[{{.qfw_component_role}}{{if .qfw_device_name}} {{.qfw_device_name}}{{end}}] {{__line__}}\"",
+          "queryType": "range"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
     }
   ],
   "links": [
