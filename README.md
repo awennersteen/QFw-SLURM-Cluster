@@ -31,6 +31,10 @@ SLURM SPANK plugin) and [QDMI] (via IQM's `iqm-qdmi` reference implementation).
 
 ## Build The Environment
 
+Image and developer builds install QDMI packages from the QFw checkout's
+`setup/qdmi-requirements.txt`. Select a QFw ref that contains this file and
+use a matching checkout on the shared mount for developer builds.
+
 <details open>
 <summary>Build a local image or configure a pulled image</summary>
 
@@ -298,7 +302,8 @@ shared-dir/
 ```bash
 QFW_CONTAINER_BASE=/path/to/shared-dir
 
-./do_configure.sh --prefix "${QFW_CONTAINER_BASE}"
+./do_configure.sh --prefix "${QFW_CONTAINER_BASE}" \
+  --qfw-ref main
 
 git clone --recursive git@github.com:openQSE/QFw.git \
   "${QFW_CONTAINER_BASE}/QFw"
@@ -436,8 +441,8 @@ The image builds and installs:
 - [QRMI] runtime: `libqrmi.so` and `qrmi.h` under `/opt/qfw/qrmi/`, the `qrmi`
   Python wheel installed into the [QFw] venv, and the SLURM SPANK plugin
   installed into `/usr/lib64/slurm/`
-- [QDMI] runtime: IQM's `iqm-qdmi` wheel installed into the [QFw]
-  venv
+- [QDMI] runtime: MQT Core and the IQM and Amazon Braket provider packages,
+  installed into the [QFw] venv from its QDMI requirements
 
 The image-level runtime environment includes:
 
@@ -475,7 +480,6 @@ Useful options:
 ./do_configure.sh --image ghcr.io/openqse/qfw-slurm-cluster:20260503-v1.0
 ./do_configure.sh --qfw-build-jobs 4
 ./do_configure.sh --qfw-ref main
-./do_configure.sh --qfw-ref v0.1.0-rc.1 --qfw-slurm-ref v0.1.0-rc.1
 ```
 
 `./do_build.sh` builds the configured image:

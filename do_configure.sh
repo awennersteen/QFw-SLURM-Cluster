@@ -13,7 +13,8 @@ DEFAULT_QFW_REF="main"
 DEFAULT_QFW_SLURM_REPOSITORY="https://github.com/openQSE/qfw-slurm.git"
 DEFAULT_QFW_SLURM_REF="main"
 DEFAULT_MQT_CORE_REPOSITORY="https://github.com/munich-quantum-toolkit/core.git"
-DEFAULT_MQT_CORE_REF="151a69f9f99d0d1fb3bd735833d3f338ebb4d8a6"
+# MQT Core v4.1.1, pinned to its immutable release commit.
+DEFAULT_MQT_CORE_REF="575acd1b9ca52e4608ccf4833e7d60640913cef4"
 ENV_FILE="${SCRIPT_DIR}/qfw-install.env"
 COMPOSE_ENV_FILE="${SCRIPT_DIR}/.env"
 TELEMETRY=false
@@ -57,9 +58,8 @@ This command prepares the mounted host workspace and writes the defaults used
 by the helper scripts and docker compose into:
   ${ENV_FILE}
 
-Release builds should pass matching QFw and qfw-slurm release tags explicitly,
-for example:
-  ./do_configure.sh --qfw-ref v0.1.0-rc.1 --qfw-slurm-ref v0.1.0-rc.1
+Release builds should pass matching QFw and qfw-slurm release tags explicitly.
+The QFw ref must contain setup/qdmi-requirements.txt.
 EOF
 }
 
