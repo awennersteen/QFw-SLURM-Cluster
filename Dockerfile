@@ -239,7 +239,8 @@ ARG NWQSIM_PREFIX=/opt/openqse/nwqsim
 ARG TNQVM_PREFIX=/opt/openqse/tnqvm
 ARG SIMULATOR_WORK_ROOT=/tmp/qfw-simulator-build
 ARG MQT_CORE_REPOSITORY=https://github.com/munich-quantum-toolkit/core.git
-ARG MQT_CORE_REF=151a69f9f99d0d1fb3bd735833d3f338ebb4d8a6
+# MQT Core v4.1.1, pinned to its immutable release commit.
+ARG MQT_CORE_REF=575acd1b9ca52e4608ccf4833e7d60640913cef4
 ARG MQT_CC_VENV=/opt/openqse/mqt-cc-venv
 ARG MQT_CORE_SOURCE=/tmp/mqt-core-source
 
@@ -412,12 +413,7 @@ RUN set -ex \
     && test -x "${TNQVM_PREFIX}/bin/circuit_runner.tnqvm" \
     && test -f "${TNQVM_PREFIX}/xacc/plugins/libtnqvm.so"
 
-# Keep the QFw shim's Python dependencies aligned with do_qfw_build.sh.
-# Its QDMI driver needs mqt.core.qdmi.driver and the device libraries it
-# drives: IQM's (iqm-qdmi) and Amazon Braket's (amazon-braket-qdmi, MQSC's
-# library, built on QDMI 1.3.3 like iqm-qdmi 1.4; 1.2.0 is the last release
-# on that QDMI, so it is pinned, and its extras need mqt-core 4, so none are
-# installed). setup/requirements.txt supplies Qiskit.
+# Share QFw's QDMI package pins with developer installs.
 # DEFw finds libfabric through pkg-config. Without libfabric's .pc file on the
 # search path it still builds, as a TCP-only transport, so the last check makes
 # sure the installed library links libfabric.
@@ -429,10 +425,7 @@ RUN set -ex \
         -r "${QFW_IMAGE_SOURCE}/setup/build-requirements.txt" \
         -r "${QFW_IMAGE_SOURCE}/setup/requirements.txt" \
         "qrmi==${QRMI_VERSION}" \
-        'iqm-qdmi>=1.4' \
-        'amazon-braket-qdmi==1.2.0' \
-        'mqt-core==3.9.2' \
-        'jsonschema>=4' \
+        -r "${QFW_IMAGE_SOURCE}/setup/qdmi-requirements.txt" \
     && export PKG_CONFIG_PATH="${LIBFABRIC_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}" \
     && PATH="${QFW_IMAGE_VENV}/bin:${PATH}" cmake \
         -S "${QFW_IMAGE_SOURCE}" \
@@ -495,7 +488,8 @@ RUN set -ex \
     && test -x "${QFW_IMAGE_VENV}/bin/qfw-squeue" \
     && rm -rf "${QFW_SLURM_SOURCE}" "${QFW_SLURM_BUILD}"
 
-# The separate environment keeps Qiskit 2.5.x apart from QFw's SDK pins.
+# Keep `mqt-cc` in a separate environment because it needs Qiskit 2.5.x
+# while QFw pins Qiskit 2.2.3.
 ARG SETUP_MLIR_VERSION=v1.4.2
 ARG MLIR_VERSION=23.1.1
 ARG MLIR_PREFIX=/opt/llvm-23.1.1
