@@ -21,20 +21,17 @@ separately below.
 
 ## Build the cluster
 
-Select a QFw ref containing `setup/qdmi-requirements.txt` as described in
-[README.md](README.md). Older release tags cannot supply these dependencies.
+The selected QFw ref must include `setup/qdmi-requirements.txt` (see
+[README.md](README.md)).
 
 ```bash
-./do_configure.sh \
-  --qfw-ref main
+./do_configure.sh --qfw-ref main
 ./do_build.sh
 ./do_startup.sh
 ```
 
-Along with Slurm and the simulators, the image installs QFw at
-`/opt/openqse/qfw`, and its Python
-environment at `/opt/openqse/qfw-venv`, including the shim's QRMI and QDMI
-dependencies.
+The image installs QFw at `/opt/openqse/qfw` and its Python environment,
+including the shim's QRMI and QDMI dependencies, at `/opt/openqse/qfw-venv`.
 
 ## Which shim installation is tested
 

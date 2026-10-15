@@ -189,8 +189,8 @@ if [ "${QFW_SKIP_VENV}" != "true" ]; then
     else
         echo "No QRMI version pin available; installing unpinned qrmi" >&2
     fi
-    # QHW packages are copied into site-packages, so their dependencies
-    # (including jsonschema) must be supplied by QFw's requirements.
+    # QHW packages are copied into site-packages. QFw's requirements supply
+    # their dependencies, including jsonschema.
     uv pip install \
         -r "${QFW_SRC}/setup/build-requirements.txt" \
         -r "${QFW_SRC}/setup/requirements.txt" \

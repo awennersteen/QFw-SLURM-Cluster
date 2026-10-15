@@ -413,7 +413,7 @@ RUN set -ex \
     && test -x "${TNQVM_PREFIX}/bin/circuit_runner.tnqvm" \
     && test -f "${TNQVM_PREFIX}/xacc/plugins/libtnqvm.so"
 
-# Use QFw's matched Core/provider versions for image and developer installs.
+# Share QFw's QDMI package pins with developer installs.
 # DEFw finds libfabric through pkg-config. Without libfabric's .pc file on the
 # search path it still builds, as a TCP-only transport, so the last check makes
 # sure the installed library links libfabric.
@@ -488,8 +488,8 @@ RUN set -ex \
     && test -x "${QFW_IMAGE_VENV}/bin/qfw-squeue" \
     && rm -rf "${QFW_SLURM_SOURCE}" "${QFW_SLURM_BUILD}"
 
-# The compiler uses the same Core release as the QFw runtime, in a separate
-# environment because it needs Qiskit 2.5.x while QFw pins Qiskit 2.2.3.
+# Keep `mqt-cc` in a separate environment because it needs Qiskit 2.5.x
+# while QFw pins Qiskit 2.2.3.
 ARG SETUP_MLIR_VERSION=v1.4.2
 ARG MLIR_VERSION=23.1.1
 ARG MLIR_PREFIX=/opt/llvm-23.1.1

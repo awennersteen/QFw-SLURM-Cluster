@@ -31,10 +31,9 @@ SLURM SPANK plugin) and [QDMI] (via IQM's `iqm-qdmi` reference implementation).
 
 ## Build The Environment
 
-The QFw checkout owns the QDMI dependency set in
-`setup/qdmi-requirements.txt`. Both image and developer installs consume it.
-Use a QFw ref containing this file, and use the matching shared-mount checkout
-for developer builds.
+Image and developer builds install QDMI packages from the QFw checkout's
+`setup/qdmi-requirements.txt`. Select a QFw ref that contains this file and
+use a matching checkout on the shared mount for developer builds.
 
 <details open>
 <summary>Build a local image or configure a pulled image</summary>
@@ -431,8 +430,8 @@ The image builds and installs:
 - [QRMI] runtime: `libqrmi.so` and `qrmi.h` under `/opt/qfw/qrmi/`, the `qrmi`
   Python wheel installed into the [QFw] venv, and the SLURM SPANK plugin
   installed into `/usr/lib64/slurm/`
-- [QDMI] runtime: MQT Core and the IQM/Braket provider wheels installed into
-  the [QFw] venv from its shared QDMI requirements
+- [QDMI] runtime: MQT Core and the IQM and Amazon Braket provider packages,
+  installed into the [QFw] venv from its QDMI requirements
 
 The image-level runtime environment includes:
 
