@@ -102,6 +102,9 @@ docker exec -i \
 set -euo pipefail
 
 QFW_BASE="${QFW_BASE:-/workspace/qfw-container-base}"
+# The caller passes this in through docker exec. Default it so this
+# body also runs standalone, as the dependency test runs it.
+QFW_BUILD_DEFW2="${QFW_BUILD_DEFW2:-false}"
 QFW_SRC="${QFW_DEV_SRC:-${QFW_BASE}/QFw}"
 QFW_VENV="${QFW_DEV_VENV:-${QFW_BASE}/qfw-venv}"
 QFW_BUILD="${QFW_DEV_BUILD:-${QFW_BASE}/qfw-build}"
@@ -216,6 +219,8 @@ else
     source "${QFW_VENV}/bin/activate"
 fi
 
+# Expanded with the ${a[@]+...} guard below: bash 3.2 on macOS treats an
+# empty array as unbound under set -u, which the dependency test trips.
 defw2_option=()
 if [ "${QFW_BUILD_DEFW2}" = "true" ]; then
     defw2_option=(-DQFW_BUILD_DEFW2=ON)
@@ -226,7 +231,7 @@ cmake -S "${QFW_SRC}" -B "${QFW_BUILD}" \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_INSTALL_PREFIX="${QFW_PREFIX}" \
     -DQFW_BUILD_BUNDLED_DEFW=ON \
-    "${defw2_option[@]}"
+    ${defw2_option[@]+"${defw2_option[@]}"}
 
 echo "== cmake build (-j ${jobs})"
 cmake --build "${QFW_BUILD}" -j "${jobs}"
