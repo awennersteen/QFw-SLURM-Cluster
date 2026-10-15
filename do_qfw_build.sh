@@ -102,6 +102,9 @@ docker exec -i \
 set -euo pipefail
 
 QFW_BASE="${QFW_BASE:-/workspace/qfw-container-base}"
+# The caller passes this in through docker exec. Default it so this
+# body also runs standalone, as the dependency test runs it.
+QFW_BUILD_DEFW2="${QFW_BUILD_DEFW2:-false}"
 QFW_SRC="${QFW_DEV_SRC:-${QFW_BASE}/QFw}"
 QFW_VENV="${QFW_DEV_VENV:-${QFW_BASE}/qfw-venv}"
 QFW_BUILD="${QFW_DEV_BUILD:-${QFW_BASE}/qfw-build}"
@@ -161,6 +164,11 @@ if [ ! -f "${QFW_SRC}/CMakeLists.txt" ]; then
 fi
 
 if [ "${QFW_SKIP_VENV}" != "true" ]; then
+    if [ ! -f "${QFW_SRC}/setup/qdmi-requirements.txt" ]; then
+        echo "No QDMI requirements at ${QFW_SRC}/setup/qdmi-requirements.txt." >&2
+        echo "Select a QFw checkout containing the shared QDMI requirements." >&2
+        exit 1
+    fi
     if [ ! -f "${MQT_CORE_SRC}/pyproject.toml" ]; then
         echo "No MQT Core checkout at ${MQT_CORE_SRC}." >&2
         echo "Clone it onto the shared mount from the host:" >&2
@@ -184,36 +192,23 @@ if [ "${QFW_SKIP_VENV}" != "true" ]; then
     # shellcheck disable=SC1091
     source "${QFW_VENV}/bin/activate"
     uv pip install --upgrade pip setuptools wheel
-    uv pip install -r "${QFW_SRC}/setup/build-requirements.txt"
-    uv pip install -r "${QFW_SRC}/setup/requirements.txt"
 
     # Match the QRMI bindings to the C library built into the image.
     qrmi_pin="${QRMI_VERSION:-${QFW_VERSION_FALLBACK:-}}"
+    qrmi_requirement=qrmi
     if [ -n "${qrmi_pin}" ]; then
         echo "== qrmi bindings pinned to ${qrmi_pin}"
-        uv pip install "qrmi==${qrmi_pin}"
+        qrmi_requirement="qrmi==${qrmi_pin}"
     else
         echo "No QRMI version pin available; installing unpinned qrmi" >&2
-        uv pip install qrmi
     fi
-    # The QFw driver needs the IQM device library, ID, and prefix. Version 1.4
-    # also provides the queue properties used with QDMI 1.3.3.
-    uv pip install 'iqm-qdmi>=1.4'
-
-    # The same driver reaches Amazon Braket through MQSC's device library.
-    # 1.2.0 is the last release on QDMI 1.3.3, the QDMI iqm-qdmi 1.4 uses, so
-    # it is pinned; its qiskit and pennylane extras need mqt-core 4, so none
-    # are installed.
-    uv pip install 'amazon-braket-qdmi==1.2.0'
-
-    # The QFw driver imports mqt.core.qdmi.driver, available since 3.9.
-    uv pip install 'mqt-core==3.9.2'
-
-    # The bundled QHW packages (qhw-data, qhw-iqm, qhw-admission, qhw-scheduler)
-    # are installed into site-packages by file copy, so their declared
-    # dependencies are not resolved. qhw-data needs jsonschema for
-    # schema validation, which the shim's qhw record building relies on.
-    uv pip install 'jsonschema>=4'
+    # QHW packages are copied into site-packages. QFw's requirements supply
+    # their dependencies, including jsonschema.
+    uv pip install \
+        -r "${QFW_SRC}/setup/build-requirements.txt" \
+        -r "${QFW_SRC}/setup/requirements.txt" \
+        -r "${QFW_SRC}/setup/qdmi-requirements.txt" \
+        "${qrmi_requirement}"
 
     # DEFw v2 builds its Python binding only when cffi is there to build it.
     if [ "${QFW_BUILD_DEFW2}" = "true" ]; then
@@ -224,6 +219,8 @@ else
     source "${QFW_VENV}/bin/activate"
 fi
 
+# Expanded with the ${a[@]+...} guard below: bash 3.2 on macOS treats an
+# empty array as unbound under set -u, which the dependency test trips.
 defw2_option=()
 if [ "${QFW_BUILD_DEFW2}" = "true" ]; then
     defw2_option=(-DQFW_BUILD_DEFW2=ON)
@@ -234,7 +231,7 @@ cmake -S "${QFW_SRC}" -B "${QFW_BUILD}" \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_INSTALL_PREFIX="${QFW_PREFIX}" \
     -DQFW_BUILD_BUNDLED_DEFW=ON \
-    "${defw2_option[@]}"
+    ${defw2_option[@]+"${defw2_option[@]}"}
 
 echo "== cmake build (-j ${jobs})"
 cmake --build "${QFW_BUILD}" -j "${jobs}"
