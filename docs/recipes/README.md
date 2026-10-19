@@ -13,6 +13,7 @@ using the virtual QFw Slurm cluster.
 | Run a guarded real-IQM application job | [Run an IQM job](run-iqm-job.md) |
 | Run a heterogeneous application job | [Run a heterogeneous NWQSim job](run-heterogeneous-nwqsim-job.md) |
 | Inspect and recover the cluster | [Inspect and recover services](inspect-and-recover-services.md) |
+| Run the Prefect-orchestrated SQD closed loop | [Run the Prefect SQD closed loop](run-prefect-sqd-closed-loop.md) |
 
 The commands assume the image-contained installations:
 
