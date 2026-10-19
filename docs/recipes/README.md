@@ -12,6 +12,7 @@ using the virtual QFw Slurm cluster.
 | Run a normal NWQSim application job | [Run an NWQSim job](run-nwqsim-job.md) |
 | Run a guarded real-IQM application job | [Run an IQM job](run-iqm-job.md) |
 | Run a heterogeneous application job | [Run a heterogeneous NWQSim job](run-heterogeneous-nwqsim-job.md) |
+| Run a Pulser program on Pasqal (QFw#158, developer build) | [Run a Pasqal Pulser job](run-pasqal-pulser-job.md) |
 | Inspect and recover the cluster | [Inspect and recover services](inspect-and-recover-services.md) |
 
 The commands assume the image-contained installations:
