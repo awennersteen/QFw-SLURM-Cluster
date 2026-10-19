@@ -24,6 +24,9 @@ die() {
 	exit 1
 }
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+shared_root="${QFW_CONTAINER_BASE:-${script_dir}/shared-dir}"
+
 docker inspect --format '{{.State.Running}}' "${container}" 2>/dev/null |
 	grep -qx true || die "container ${container} is not running"
 docker exec "${container}" id -u "${user}" >/dev/null 2>&1 ||
@@ -32,6 +35,13 @@ docker exec "${container}" id -u "${user}" >/dev/null 2>&1 ||
 echo "qfw-prefect: provisioning as ${user} in ${container}"
 echo "qfw-prefect:   venv      ${venv}"
 echo "qfw-prefect:   checkout  ${checkout} at ${ref}"
+
+# The quantum-stage sampler and its submitter, read by jobs on every node
+# from the shared workspace (docs/recipes/run-quantum-stage-through-qfw-slurm.md).
+install -d "${shared_root}/qfw-prefect"
+install -m 0644 "${script_dir}"/prefect/qfw_sampler.py \
+	"${script_dir}"/prefect/qfw_slurm_sampler.py "${shared_root}/qfw-prefect/"
+echo "qfw-prefect:   sampler   ${shared_root}/qfw-prefect"
 
 docker exec -i -u "${user}" \
 	-e "PREFECT_VENV=${venv}" \
