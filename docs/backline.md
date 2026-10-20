@@ -1,7 +1,7 @@
 # Backline QPM (`backline-local`)
 
-`backline-local` is a client-executed QPM (QFw `services/svc_backline_qpm`, branch
-`backline-qpm`). A reservation picks a Backline controller, QEC decoder coprocessor and
+`backline-local` is a client-executed QPM (QFw `services/svc_backline_qpm`). A
+reservation picks a Backline controller, QEC decoder coprocessor and
 transport from the site inventory; the application reads that placement and runs its
 PennyLane/Catalyst program on it. It never sends circuits through QRI.
 
@@ -10,19 +10,18 @@ start it.
 
 ## Set up once
 
-The Backline QPM is on the `backline-qpm` branch of
-[josephleekl/QFw](https://github.com/josephleekl/QFw/tree/backline-qpm). The image keeps its
-stock QFw; the Backline QPM runs from a development override built from that branch (see
+The Backline QPM is in [openQSE/QFw](https://github.com/openQSE/QFw). The image keeps its
+stock QFw; the Backline QPM runs from a development override built from QFw `main` (see
 "Build and use a development QFw override" in the README).
 
 On the host:
 
 ```bash
-git clone -b backline-qpm https://github.com/josephleekl/QFw-SLURM-Cluster
+git clone https://github.com/openQSE/QFw-SLURM-Cluster
 cd QFw-SLURM-Cluster
 SHARED=/path/to/shared-dir
 ./do_configure.sh --prefix "$SHARED"
-git clone --recursive -b backline-qpm https://github.com/josephleekl/QFw "$SHARED/QFw"
+git clone --recursive https://github.com/openQSE/QFw "$SHARED/QFw"
 ./do_build.sh
 ./do_startup.sh
 ./do_qfw_build.sh --clean                     # the override, in $SHARED/qfw-install
