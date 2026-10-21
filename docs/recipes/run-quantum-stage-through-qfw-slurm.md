@@ -8,8 +8,8 @@ integration expects, and it works offline against the NWQSim QPM. A
 workflow manager such as Prefect only submits the job, waits for it and
 reads a file back; it holds no QFw state of its own.
 
-The cluster ships two files for it under `prefect/`, installed on the shared
-workspace at `/workspace/qfw-container-base/qfw-prefect/` by
+The cluster ships two files for it under `prefect/`, installed in the Prefect
+workspace at `/workspace/qfw-container-base/qfw-prefect/bin/` by
 `tools/provision-prefect.sh`:
 
 | File | Role |
@@ -44,8 +44,8 @@ As an application user in `slurmctld`, sample a five-qubit GHZ circuit:
 
 ```bash
 docker exec -u user-a slurmctld \
-  /workspace/qfw-container-base/qfw-prefect-venv/bin/python \
-  /workspace/qfw-container-base/qfw-prefect/qfw_slurm_sampler.py \
+  /workspace/qfw-container-base/qfw-prefect/venv/bin/python \
+  /workspace/qfw-container-base/qfw-prefect/bin/qfw_slurm_sampler.py \
   --qpu nwqsim --qubits 5 --shots 1024
 ```
 
@@ -79,7 +79,7 @@ A Prefect task, or any Python running on the controller with `sbatch` and
 
 ```python
 import sys
-sys.path.insert(0, "/workspace/qfw-container-base/qfw-prefect")
+sys.path.insert(0, "/workspace/qfw-container-base/qfw-prefect/bin")
 from qfw_slurm_sampler import run_sampler_job
 
 record = run_sampler_job(circuit, shots=100_000, qpu="nwqsim",
