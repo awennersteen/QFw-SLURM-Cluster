@@ -10,6 +10,9 @@
         "fake-iqm-20q": {
           "enabled": true
         },
+        "backline-local": {
+          "enabled": true
+        },
         "ibm-156-nh": {
           "enabled": true,
           "api_key": "",
@@ -48,6 +51,9 @@
         "fake-iqm-20q": {
           "enabled": true
         },
+        "backline-local": {
+          "enabled": true
+        },
         "ibm-156-nh": {
           "enabled": true,
           "api_key": "",
@@ -84,6 +90,9 @@
           "api_key": ""
         },
         "fake-iqm-20q": {
+          "enabled": true
+        },
+        "backline-local": {
           "enabled": true
         },
         "ibm-156-nh": {
