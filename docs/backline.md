@@ -41,16 +41,29 @@ qfw-site-services --target backline status
 The `backline` environment module (`modulefiles/backline`) points `CATALYST_LIB` at the
 shared venv, so the QPM's inventory finds the precompiled decoders.
 
+### On an existing cluster
+
+On a cluster that is already set up, pull this, then run these in place of `./do_build.sh` and
+`./do_startup.sh` above; `./do_qfw_build.sh --clean` and the in-cluster steps are unchanged:
+
+```bash
+./do_build.sh                       # modulefiles/backline is copied into the image
+./do_restart.sh --force-recreate    # recreate the containers from it, adding qec-backline-head
+./update_slurmfiles.sh slurm.conf   # the etc_slurm volume keeps the old slurm.conf
+./tools/provision-qfw-cluster.sh    # now reaches qec-backline-head
+```
+
 ## Run a Backline program
 
 The job script is `qri-backline/examples/job.sh`, cloned to
-`/workspace/qfw-container-base/qri-backline` by `tools/install-backline-venv.sh`:
+`/workspace/qfw-container-base/qri-backline` by `tools/install-backline-venv.sh`. Submit it
+as a provisioned test user, not root (root batch jobs may take slurmd down on this
+cluster). qfw-slurm requires a Slurm account (`-A`); the test users use `qfw-test`:
 
 ```bash
-sbatch -A <account> /workspace/qfw-container-base/qri-backline/examples/job.sh
+./do_ssh.sh --user user-a
+sbatch -A qfw-test /workspace/qfw-container-base/qri-backline/examples/job.sh
 ```
-
-qfw-slurm requires a Slurm account (`-A`); the provisioned test users use `qfw-test`.
 
 The job makes two requests:
 
@@ -65,6 +78,13 @@ The job makes two requests:
    there. The executor stops when the reservation ends.
 
 `--max-qubits` counts logical qubits.
+
+## Security
+
+The `catalyst-executor` runs whatever compiled program a client sends it. It listens on
+all interfaces and does not authenticate clients, so anyone who can reach its port can run
+code as the user the QPM runs as, which is root on `qec-backline-head`. Use it only on a
+trusted network until this is addressed.
 
 ## Files
 
