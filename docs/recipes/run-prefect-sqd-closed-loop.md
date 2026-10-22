@@ -54,22 +54,30 @@ cd /path/to/QFw-SLURM-Cluster
 tools/provision-prefect.sh
 ```
 
-The script runs as `user-a` in `slurmctld` and is safe to rerun. It:
+The script is safe to rerun. Its one root step creates the Prefect
+workspace, `/workspace/qfw-container-base/qfw-prefect` (`QFW_PREFECT_ROOT`
+overrides), and hands it to `user-a`: the shared mount's root belongs to
+whoever owns it on the Docker host, so an application user cannot create
+anything there directly. Everything else runs as `user-a` inside that
+workspace:
 
-1. Clones `qcsc-prefect` to `/workspace/qfw-container-base/qcsc-prefect` at
-   the commit this recipe was validated with (`QCSC_PREFECT_REF` overrides).
-2. Creates `/workspace/qfw-container-base/qfw-prefect-venv` with the image
-   venv's exact package set, so QFw's pins (qiskit, qrmi, the QDMI adapters)
-   stay in force, then adds Prefect, Ray, ffsim, pyscf, qiskit-addon-sqd and
-   the qcsc-prefect packages. One image pin is overridden: `ruamel-yaml`,
-   which the IQM QDMI adapter pins at 0.17 while every `pydantic_numpy` that
-   imports under NumPy 2.5 needs 0.18. Nothing on the Prefect path uses it.
+1. Clones `qcsc-prefect` to `qcsc-prefect/` at the commit this recipe was
+   validated with (`QCSC_PREFECT_REF` overrides).
+2. Creates `venv/` with the image venv's exact package set, so QFw's pins
+   (qiskit, qrmi, the QDMI adapters) stay in force, then adds Prefect, Ray,
+   ffsim, pyscf, qiskit-addon-sqd and the qcsc-prefect packages. One image
+   pin is overridden: `ruamel-yaml`, which the IQM QDMI adapter pins at 0.17
+   while every `pydantic_numpy` that imports under NumPy 2.5 needs 0.18.
+   Nothing on the Prefect path uses it. FastAPI is held below 0.150: Prefect
+   3.8.8's server still passes `min_items` to `Body()`, which FastAPI dropped
+   inside the range Prefect allows, and the server then fails to start.
 3. Rebuilds ffsim from source when its wheel dies with an illegal instruction,
    which it does on Apple Silicon hosts.
 4. Builds the native SBD solver with the image's OpenMPI and OpenBLAS.
-5. Verifies the venv under `qfw-activate`, which is how the workflow uses it.
+5. Installs the quantum-stage sampler and its submitter under `bin/`.
+6. Verifies the venv under `qfw-activate`, which is how the workflow uses it.
 
-The venv lives on the shared workspace and survives a container recreate.
+The workspace lives on the shared mount and survives a container recreate.
 Expect several minutes on first run, mostly the ffsim build.
 
 ## Start the Server and Serve the Deployment
