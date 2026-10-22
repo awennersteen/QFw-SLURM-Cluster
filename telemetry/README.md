@@ -29,6 +29,11 @@ every instrumentation site in QFw is a boolean test.
 
 ## Starting it
 
+This section is the container cluster. For a real site without containers,
+`baremetal/` installs the same stack as plain processes on one host from the
+same configurations; the recipe is
+[docs/recipes/deploy-telemetry-baremetal.md](../docs/recipes/deploy-telemetry-baremetal.md).
+
 On a cluster that is already running:
 
 ```bash
