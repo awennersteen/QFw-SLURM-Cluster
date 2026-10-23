@@ -221,6 +221,8 @@ Everything about the stack, what reports and how, the dashboards, the
 Prometheus metric names and troubleshooting is in
 [telemetry/README.md](telemetry/README.md). Without the overlay nothing in
 QFw changes.
+For a site without containers, the same stack installs on one host as plain
+processes: [Deploy the telemetry stack on bare metal](docs/recipes/deploy-telemetry-baremetal.md).
 
 ## Build And Run [QFw]
 
